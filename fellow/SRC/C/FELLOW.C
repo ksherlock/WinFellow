@@ -497,6 +497,7 @@ void fellowStepOver(void)
 /*============================================================================*/
 
 void fellowRunDebug(ULO breakpoint) {
+  breakpoint = 0xf401a6;
   fellowRequestEmulationStopClear();
   if (fellowGetPreStartReset()) fellowHardReset();
   fellowSetRuntimeErrorCode((fellow_runtime_error_codes) setjmp(fellow_runtime_error_env));

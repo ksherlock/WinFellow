@@ -676,11 +676,14 @@ void fhfileCardMap(ULO mapping) {
 static void fhfileMakeDOSDevPacket(ULO devno, ULO unitnameptr, ULO devnameptr){
   if (fhfile_devs[devno].F) {
     memoryDmemSetLong(devno);				     /* Flag to initcode */
+
     memoryDmemSetLong(unitnameptr);			     /*  0 Device driver name "FELLOWX" */
     memoryDmemSetLong(devnameptr);			     /*  4 Device name "fhfile.device" */
     memoryDmemSetLong(devno);				     /*  8 Unit # */
     memoryDmemSetLong(0);				     /* 12 OpenDevice flags */
-    memoryDmemSetLong(16);                                   /* 16 Environment size */
+
+    // Struct DosEnvec
+    memoryDmemSetLong(16);                                   /* 16 Environment size in long words*/
     memoryDmemSetLong(fhfile_devs[devno].bytespersector>>2); /* 20 Longwords in a block */
     memoryDmemSetLong(0);				     /* 24 sector origin (unused) */
     memoryDmemSetLong(fhfile_devs[devno].surfaces);	     /* 28 Heads */
@@ -736,7 +739,7 @@ void fhfileHardReset(void) {
 
   if ((!fhfileHasZeroDevices()) &&
     fhfileGetEnabled() && 
-    (memoryGetKickImageVersion() >= 36)) {
+    (memoryGetKickImageVersion() >= 34)) {
       memoryDmemSetCounter(0);
 
       /* Device-name and ID string */
@@ -744,7 +747,7 @@ void fhfileHardReset(void) {
       devicename = memoryDmemGetCounter();
       memoryDmemSetString("fhfile.device");
       idstr = memoryDmemGetCounter();
-      memoryDmemSetString("Fellow Hardfile device V3");
+      memoryDmemSetString("Fellow Hardfile device V4");
 
       /* Device name as seen in Amiga DOS */
 
@@ -845,7 +848,7 @@ void fhfileHardReset(void) {
 
       fhfile_bootcode = memoryDmemGetCounter();
       memoryDmemSetWord(0x227c); memoryDmemSetLong(doslibname); /* move.l #doslibname,a1 */
-      memoryDmemSetLong(0x4eaeffa0);			      /* jsr    -96(a6) */
+      memoryDmemSetLong(0x4eaeffa0);			      /* jsr    -96(a6) ; FindResident() */
       memoryDmemSetWord(0x2040);				      /* move.l d0,a0 */
       memoryDmemSetLong(0x20280016);			      /* move.l 22(a0),d0 */
       memoryDmemSetWord(0x2040);				      /* move.l d0,a0 */
@@ -861,17 +864,17 @@ void fhfileHardReset(void) {
       memoryDmemSetByte(0x2C); memoryDmemSetByte(0x78);
       memoryDmemSetByte(0x00); memoryDmemSetByte(0x04);
       memoryDmemSetByte(0x43); memoryDmemSetByte(0xFA);
-      memoryDmemSetByte(0x00); memoryDmemSetByte(0xA6);
+      memoryDmemSetByte(0x00); memoryDmemSetByte(0xAA);
       memoryDmemSetByte(0x4E); memoryDmemSetByte(0xAE);
       memoryDmemSetByte(0xFE); memoryDmemSetByte(0x68);
       memoryDmemSetByte(0x28); memoryDmemSetByte(0x40);
       memoryDmemSetByte(0x41); memoryDmemSetByte(0xFA);
-      memoryDmemSetByte(0x00); memoryDmemSetByte(0xAE);
+      memoryDmemSetByte(0x00); memoryDmemSetByte(0xB2);
       memoryDmemSetByte(0x2E); memoryDmemSetByte(0x08);
       memoryDmemSetByte(0x20); memoryDmemSetByte(0x47);
       memoryDmemSetByte(0x4A); memoryDmemSetByte(0x90);
       memoryDmemSetByte(0x6B); memoryDmemSetByte(0x00);
-      memoryDmemSetByte(0x00); memoryDmemSetByte(0x82);
+      memoryDmemSetByte(0x00); memoryDmemSetByte(0x86);
       memoryDmemSetByte(0x58); memoryDmemSetByte(0x87);
       memoryDmemSetByte(0x20); memoryDmemSetByte(0x3C);
       memoryDmemSetByte(0x00); memoryDmemSetByte(0x00);
@@ -889,9 +892,11 @@ void fhfileHardReset(void) {
       memoryDmemSetByte(0x08); memoryDmemSetByte(0x00);
       memoryDmemSetByte(0x59); memoryDmemSetByte(0x80);
       memoryDmemSetByte(0x64); memoryDmemSetByte(0xF6);
+      memoryDmemSetByte(0xCD); memoryDmemSetByte(0x4C);
       memoryDmemSetByte(0x20); memoryDmemSetByte(0x4D);
-      memoryDmemSetByte(0x4E); memoryDmemSetByte(0xAC);
+      memoryDmemSetByte(0x4E); memoryDmemSetByte(0xAE);
       memoryDmemSetByte(0xFF); memoryDmemSetByte(0x70);
+      memoryDmemSetByte(0xCD); memoryDmemSetByte(0x4C);
       memoryDmemSetByte(0x26); memoryDmemSetByte(0x40);
       memoryDmemSetByte(0x70); memoryDmemSetByte(0x00);
       memoryDmemSetByte(0x27); memoryDmemSetByte(0x40);
@@ -935,7 +940,7 @@ void fhfileHardReset(void) {
       memoryDmemSetByte(0x00); memoryDmemSetByte(0x00);
       memoryDmemSetByte(0x00); memoryDmemSetByte(0x58);
       memoryDmemSetByte(0x60); memoryDmemSetByte(0x00);
-      memoryDmemSetByte(0xFF); memoryDmemSetByte(0x7A);
+      memoryDmemSetByte(0xFF); memoryDmemSetByte(0x76);
       memoryDmemSetByte(0x2C); memoryDmemSetByte(0x78);
       memoryDmemSetByte(0x00); memoryDmemSetByte(0x04);
       memoryDmemSetByte(0x22); memoryDmemSetByte(0x4C);
@@ -953,8 +958,6 @@ void fhfileHardReset(void) {
       memoryDmemSetByte(0x62); memoryDmemSetByte(0x72);
       memoryDmemSetByte(0x61); memoryDmemSetByte(0x72);
       memoryDmemSetByte(0x79); memoryDmemSetByte(0x00);
-
-
 
       /* The mkdosdev packets */
 
