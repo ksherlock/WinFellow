@@ -26,10 +26,10 @@ loop:		move.l	(a0,d0.l),(a5,d0.l)	; Copy packet to a5
 		subq.l	#4,d0
 		bcc.s	loop
 
-		exg.l	a4, a6			; KS 1.3 expects libary in a6....
+		exg	a4, a6			; KS 1.3 expects libary in a6....
 		move.l	a5,a0			; MakeDosNode(a0 - packet) 
 		jsr	-144(a6)				
-		exg.l	a4, a6			; Keep expansion.library so we can close it later
+		exg	a4, a6			; Keep expansion.library so we can close it later
 
 		move.l	d0,a3			; New device node in a3
 		moveq	#0,d0
@@ -44,17 +44,17 @@ loop:		move.l	(a0,d0.l),(a5,d0.l)	; Copy packet to a5
 
 
 		move.l	d7,a1
-		move.l	-4(a1),d6		
-		move.l	d0,a1	;  Bootnode in a1
+		move.l	-4(a1),d6		; Our unit number	
+		move.l	d0,a1			; Bootnode in a1
 		
 		moveq	#0,d0
-		move.l	d0,(a1)			; 
-		move.l	d0,4(a1)		; 
-		move.w	d0,14(a1)
-		move.w	#$10ff,8(a1)	; Node type
-		sub.w	d6,8(a1)		; Node type again (?)
-		move.l	$f40ffc,10(a1)	; Configdev pointer
-		move.l	a3,16(a1)		; Device node pointer
+		move.l	d0,(a1)			; Successor = 0
+		move.l	d0,4(a1)		; Predecessor = 0
+		move.w	d0,14(a1)		: bn_Flags
+		move.w	#$10ff,8(a1)	; Node type (0x10 bootnode) and priority
+		sub.w	d6,8(a1)		; Subtract unit no from priority
+		move.l	$f40ffc,10(a1)	; Configdev pointer (ln_Name ?)
+		move.l	a3,16(a1)		; Device node pointer (bn_DeviceNode)
 
 		lea	74(a4),a0
 		jsr	-270(a6)				; Enqueue()
